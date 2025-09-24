@@ -1,3 +1,4 @@
+![Banner](assets/abstract_banner.jpg)
 # Data Collection & Visualization
 
 cs3435 Fall 2025
