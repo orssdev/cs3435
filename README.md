@@ -8,6 +8,7 @@ run: `conda create -n cs3435 python=3.12`
 
 Install the following packages:  
 run: `conda install beautifulsoup4 seaborn requests jupyter ipython`  
-and  
+
 run: `conda install -c conda-forge selenium scrapy protego scikit-learn`
 
+run: `conda install -c conda-forge python-dotenv`
