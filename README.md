@@ -16,4 +16,4 @@ run: `conda install -c conda-forge python-dotenv`
 
 ## HW3
 To export data to jsonl file in /hw3   
-run: `scrapy crawl hw3 -O plot_explained.jsonl`
+run: `scrapy crawl hw3 -O hw3.jsonl`
