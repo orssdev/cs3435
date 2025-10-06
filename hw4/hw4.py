@@ -1,10 +1,12 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 import time
 import requests
 from protego import Protego
 import json
 from dotenv import load_dotenv
+import random
 import os
 
 load_dotenv()
@@ -40,7 +42,7 @@ def neal_fun_paper(driver):
     imgs = driver.find_elements(By.XPATH, '//img')
     image = imgs[1].get_attribute('src')
     analogy = driver.find_element(By.CSS_SELECTOR, 'div.fold-analogy').text
-    height = analogy.split()[- 2]
+    height = analogy.split()[-2]
     data = {
         'url': 'https://neal.fun/paper/',
         'title': title,
@@ -95,13 +97,33 @@ def neal_fun_trolly(driver):
         next_button = driver.find_element(By.CSS_SELECTOR, 'button.action.action-next')
         next_button.click()
 
+def monkey_type(driver):
+    driver.get('https://monkeytype.com/')
+    time.sleep(1)
+    driver.find_element(By.CSS_SELECTOR, 'button.rejectAll').click()
+    words_container = driver.find_element(By.CSS_SELECTOR, 'div#words')
+    words = words_container.find_elements(By.CSS_SELECTOR, 'div.word')
+    time.sleep(5)
+    letters = []
+    for word in words:
+        letters += [x.text for x in word.find_elements(By.CSS_SELECTOR, 'letter')]
+    letters.reverse()
+    body = driver.find_element(By.CSS_SELECTOR, 'body')
+    for _ in range(10):
+        print('In loop')
+        ms = round(random.randint(1,3))
+        time.sleep(ms)
+        body.send_keys(letters.pop())
+
+
 user_agent = os.getenv('USER_AGENT')
 HEADERS = {'user-agent': user_agent}
 driver = webdriver.Chrome()
 
 urls = [
     ('https://neal.fun/', 'https://neal.fun/paper/', neal_fun_paper),
-    ('https://neal.fun/', 'https://neal.fun/absurd-trolley-problems/', neal_fun_trolly)
+    ('https://neal.fun/', 'https://neal.fun/absurd-trolley-problems/', neal_fun_trolly),
+    ('https://monkeytype.com/', 'https://monkeytype.com/', monkey_type)
 ]
 
 for url, index, fun in urls:
