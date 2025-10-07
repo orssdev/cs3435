@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 import time
 import requests
@@ -8,6 +9,7 @@ import json
 from dotenv import load_dotenv
 import random
 import os
+import string
 
 load_dotenv()
 json_lines_file = 'data.jsonl'
@@ -98,22 +100,61 @@ def neal_fun_trolly(driver):
         next_button.click()
 
 def monkey_type(driver):
-    driver.get('https://monkeytype.com/')
-    time.sleep(1)
-    driver.find_element(By.CSS_SELECTOR, 'button.rejectAll').click()
-    words_container = driver.find_element(By.CSS_SELECTOR, 'div#words')
-    words = words_container.find_elements(By.CSS_SELECTOR, 'div.word')
-    time.sleep(5)
-    letters = []
-    for word in words:
-        letters += [x.text for x in word.find_elements(By.CSS_SELECTOR, 'letter')]
-    letters.reverse()
-    body = driver.find_element(By.CSS_SELECTOR, 'body')
-    for _ in range(10):
-        print('In loop')
-        ms = round(random.randint(1,3))
-        time.sleep(ms)
-        body.send_keys(letters.pop())
+        for _ in range(1):
+            driver.get('https://monkeytype.com/')
+            actions = ActionChains(driver)
+            time.sleep(1)
+            reject = driver.find_elements(By.CSS_SELECTOR, 'button.rejectAll')
+            if reject:
+                reject[0].click()
+            words_container = driver.find_element(By.CSS_SELECTOR, 'div#words')
+            words = words_container.find_elements(By.CSS_SELECTOR, 'div.word')
+            letters = []
+            for word in words:
+                letters += [x.text for x in word.find_elements(By.CSS_SELECTOR, 'letter')]
+                letters.append(' ')
+            timeout = 30.0
+            start = time.time()
+            typing_speed = round(random.uniform(0.1, 2), 2)
+            for c in letters:
+                if time.time() - start >= timeout:
+                    break
+                ms = round(random.uniform(0.001, typing_speed), 3)
+                time.sleep(ms)
+                if random.randint(1,random.randint(10,20)) <= random.randint(10,20):
+                    actions.send_keys(c)
+                else:
+                    error_c = random.choice(string.ascii_uppercase)
+                    actions.send_keys(error_c)
+                    ms = round(random.uniform(0.001, typing_speed), 2)
+                    time.sleep(ms)
+                    actions.perform()
+                    actions.send_keys(Keys.BACKSPACE)
+                    ms = round(random.uniform(0.001, typing_speed), 2)
+                    time.sleep(ms)
+                    actions.perform()
+                    actions.send_keys(c)
+                actions.perform()
+            time.sleep(3)
+            results = driver.find_element(By.CSS_SELECTOR, 'div#result')
+            bottoms = results.find_elements(By.CSS_SELECTOR, 'div.bottom')
+            wpm = bottoms[0].text
+            acc = bottoms[1].text
+            raw = results.find_element(By.CSS_SELECTOR, 'div.group.raw div.bottom').text
+            consistency = results.find_element(By.CSS_SELECTOR, 'div.group.flat.consistency div.bottom').text
+            correct = results.find_element(By.CSS_SELECTOR, 'div.group.key div.bottom').text.split('/')[0]
+            data = {
+                'url': 'https://monkeytype.com/',
+                'wpm': wpm,
+                'accuracy': acc,
+                'raw': raw,
+                'consistency': consistency,
+                'correct': correct
+            }
+            json_line = json.dumps(data)
+            with open(json_lines_file, 'a') as fp:
+                fp.write(json_line + '\n')
+        
 
 
 user_agent = os.getenv('USER_AGENT')
@@ -121,8 +162,8 @@ HEADERS = {'user-agent': user_agent}
 driver = webdriver.Chrome()
 
 urls = [
-    ('https://neal.fun/', 'https://neal.fun/paper/', neal_fun_paper),
-    ('https://neal.fun/', 'https://neal.fun/absurd-trolley-problems/', neal_fun_trolly),
+    # ('https://neal.fun/', 'https://neal.fun/paper/', neal_fun_paper),
+    # ('https://neal.fun/', 'https://neal.fun/absurd-trolley-problems/', neal_fun_trolly),
     ('https://monkeytype.com/', 'https://monkeytype.com/', monkey_type)
 ]
 
