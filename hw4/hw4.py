@@ -100,7 +100,7 @@ def neal_fun_trolly(driver):
         next_button.click()
 
 def monkey_type(driver):
-        for _ in range(1):
+        for _ in range(30):
             driver.get('https://monkeytype.com/')
             actions = ActionChains(driver)
             time.sleep(1)
@@ -162,8 +162,8 @@ HEADERS = {'user-agent': user_agent}
 driver = webdriver.Chrome()
 
 urls = [
-    # ('https://neal.fun/', 'https://neal.fun/paper/', neal_fun_paper),
-    # ('https://neal.fun/', 'https://neal.fun/absurd-trolley-problems/', neal_fun_trolly),
+    ('https://neal.fun/', 'https://neal.fun/paper/', neal_fun_paper),
+    ('https://neal.fun/', 'https://neal.fun/absurd-trolley-problems/', neal_fun_trolly),
     ('https://monkeytype.com/', 'https://monkeytype.com/', monkey_type)
 ]
 
