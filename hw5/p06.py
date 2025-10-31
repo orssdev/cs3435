@@ -74,15 +74,21 @@ def ceil(x):
 def get_northwest(lat, lon):
     """ Get the integer coordinates of the northwest corner of the tile
     that contains this decimal (lat, lon) coordinate. """
-    nw_lat = ceil(lat) if lat > 0 else floor(lat)
-    nw_lon = ceil(lon) if lon > 0 else floor(lon)
+    nw_lat = ceil(lat)
+    nw_lon = floor(lon)
     return nw_lat, nw_lon
 
 
-# def get_tile_grid_decimal(northwest, southeast):
-#     """ Construct the tiled grid of TIF images that contains these
-#     northwest and southeast decimal coordinates. Each corner
-#     is a tuple, (lat, lon). """
-#     nw_lat, nw_log = get_northwest(northwest[0], northwest[1])
-#     nw_lat, nw_log = get_northwest(southeast[0], southeast[1])
-#     return image
+def get_tile_grid_decimal(northwest, southeast):
+    """ Construct the tiled grid of TIF images that contains these
+    northwest and southeast decimal coordinates. Each corner
+    is a tuple, (lat, lon). """
+    lat_nw, lon_nw = northwest
+    lat_se, lon_se = southeast
+    nw_lat, nw_lon = get_northwest(lat_nw, lon_nw)
+    se_lat = floor(lat_se)
+    se_lon = ceil(lon_se)
+    num_lat = nw_lat - se_lat
+    num_lon = se_lon - nw_lon
+    image = get_tile_grid(nw_lat, nw_lon, num_lat, num_lon)
+    return image
